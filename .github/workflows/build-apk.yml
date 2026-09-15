@@ -1,0 +1,39 @@
+name: Build Ryza Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Android tools
+        shell: powershell
+        run: |
+          & ".\scripts\setup_android_tools.ps1"
+
+      - name: Build APK
+        shell: powershell
+        run: |
+          & ".\scripts\build_apk.ps1"
+
+      - name: Find APK
+        shell: powershell
+        run: |
+          Write-Host "=== APK FILES ==="
+          Get-ChildItem `
+            -Path . `
+            -Filter *.apk `
+            -Recurse |
+            Select-Object FullName, Length
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: RyzaChat-Android
+          path: output/android/*.apk
+          if-no-files-found: error

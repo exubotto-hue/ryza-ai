@@ -1,28 +1,33 @@
 name: Build APK
 
 on:
-  push:
-    branches: [ master ]
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
+      - name: Checkout Fian222's repo (has .sh scripts)
         uses: actions/checkout@v4
+        with:
+          repository: Fian222/ryza-ai-revive
+          ref: master
 
-      - name: List scripts (sanity check)
-        run: dir scripts
+      - name: Install deps
+        run: sudo apt-get update && sudo apt-get install -y curl wget tar unzip
 
-      - name: Setup Android tools (JDK17 + SDK34)
-        run: powershell -File scripts/setup_android_tools.ps1
+      - name: Setup Android tools
+        run: |
+          chmod +x scripts/setup_android_tools.sh
+          ./scripts/setup_android_tools.sh
 
       - name: Build APK
-        run: powershell -File scripts/build_apk.ps1
+        run: |
+          chmod +x scripts/build_apk.sh
+          ./scripts/build_apk.sh
 
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: RyzaChat-apk
-          path: output\android\*.apk
+          path: output/android/*.apk

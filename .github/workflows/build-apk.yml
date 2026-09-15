@@ -7,26 +7,22 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install deps (curl/wget, tar, unzip)
-        run: sudo apt-get update && sudo apt-get install -y curl wget tar unzip
+      - name: List scripts (sanity check)
+        run: dir scripts
 
-      - name: Setup Android tools (JDK17 + SDK34, project-local)
-        run: |
-          chmod +x scripts/setup_android_tools.sh
-          ./scripts/setup_android_tools.sh
+      - name: Setup Android tools (JDK17 + SDK34)
+        run: powershell -File scripts/setup_android_tools.ps1
 
       - name: Build APK
-        run: |
-          chmod +x scripts/build_apk.sh
-          ./scripts/build_apk.sh
+        run: powershell -File scripts/build_apk.ps1
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: RyzaChat-apk
-          path: output/android/*.apk
+          path: output\android\*.apk
